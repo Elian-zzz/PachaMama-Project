@@ -4,7 +4,7 @@ import { Sidebar } from "@/app/components/Sidebar";
 import { DashboardScreen } from "@/app/components/screens/DashboardScreen";
 import { PedidosScreen } from "@/app/components/screens/PedidosScreen";
 import { ClientesScreen } from "@/app/components/screens/ClientesScreen";
-import { ProductosScreen } from "@/app/components/screens/ProductosScreen";
+import { Products } from "@/app/components/screens/Products";
 import { FinanzasScreen } from "@/app/components/screens/FinanzasScreen";
 import { ConfiguracionScreen } from "@/app/components/screens/ConfiguracionScreen";
 
@@ -20,7 +20,7 @@ export default function App() {
       case "clientes":
         return <ClientesScreen />;
       case "productos":
-        return <ProductosScreen />;
+        return <Products />;
       case "finanzas":
         return <FinanzasScreen />;
       case "configuracion":
@@ -32,7 +32,7 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Toaster/>
+      <Toaster />
       {/* Sidebar */}
       <Sidebar activeScreen={activeScreen} onNavigate={setActiveScreen} />
 

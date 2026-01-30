@@ -52,7 +52,8 @@
     "jsx": "react-jsx",
 
     // Skip lib check para dependencias
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["vite/client"]
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "build"]

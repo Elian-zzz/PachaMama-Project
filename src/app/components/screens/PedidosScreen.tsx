@@ -1,282 +1,327 @@
-import { Search, Filter, Eye, Edit, Plus, Phone } from "lucide-react";
+// src/app/screens/Orders.tsx
 import { useState } from "react";
-import { Badge } from "@/app/components/ui/badge";
-import { Card } from "@/app/components/ui/card";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/app/components/ui/tabs";
-import { Input } from "@/app/components/ui/input";
-import { Button } from "@/app/components/ui/button";
+import { usePedidos } from "../../../hooks/useSupabaseData";
+import { Pedido } from "../../../services/supabase";
 
-const allOrders = [
-  {
-    id: "a7b2c",
-    cliente: "María González",
-    telefono: "555-0101",
-    productos: "Lechuga, Tomate, Cebolla",
-    total: 850,
-    estado: "entregado",
-  },
-  {
-    id: "3d9ef",
-    cliente: "Carlos Ruiz",
-    telefono: "555-0102",
-    productos: "Zanahoria, Papa, Brócoli",
-    total: 1200,
-    estado: "preparado",
-  },
-  {
-    id: "5k1m3",
-    cliente: "Ana Pérez",
-    telefono: "555-0103",
-    productos: "Espinaca, Ajo, Jengibre",
-    total: 650,
-    estado: "confirmado",
-  },
-  {
-    id: "8n4p2",
-    cliente: "Luis Martínez",
-    telefono: "555-0104",
-    productos: "Pimiento, Pepino, Acelga",
-    total: 920,
-    estado: "entregado",
-  },
-  {
-    id: "2q7r9",
-    cliente: "Sofia Torres",
-    telefono: "555-0105",
-    productos: "Cilantro, Perejil, Albahaca",
-    total: 380,
-    estado: "confirmado",
-  },
-  {
-    id: "9x3k8",
-    cliente: "Roberto Díaz",
-    telefono: "555-0106",
-    productos: "Remolacha, Nabo, Rabanito",
-    total: 540,
-    estado: "preparado",
-  },
-  {
-    id: "1h5j7",
-    cliente: "Patricia López",
-    telefono: "555-0107",
-    productos: "Kale, Rúcula, Berro",
-    total: 720,
-    estado: "confirmado",
-  },
-  {
-    id: "6f2m4",
-    cliente: "Diego Silva",
-    telefono: "555-0108",
-    productos: "Orégano, Tomillo, Romero",
-    total: 450,
-    estado: "entregado",
-  },
-  {
-    id: "4w8n1",
-    cliente: "Laura Romero",
-    telefono: "555-0109",
-    productos: "Apio, Puerro, Hinojo",
-    total: 890,
-    estado: "preparado",
-  },
-  {
-    id: "7t5p6",
-    cliente: "Gabriel Castro",
-    telefono: "555-0110",
-    productos: "Berenjena, Calabacín, Calabaza",
-    total: 1100,
-    estado: "confirmado",
-  },
-];
+type EstadoFilter = "todos" | Pedido["estado"];
 
 export function PedidosScreen() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("todos");
+  const { pedidos, loading, cambiarEstado } = usePedidos();
+  const [filtroEstado, setFiltroEstado] = useState<EstadoFilter>("todos");
+  const [busqueda, setBusqueda] = useState("");
+  const [pedidoSeleccionado, setPedidoSeleccionado] = useState<Pedido | null>(
+    null,
+  );
 
-  const filteredOrders = allOrders.filter((order) => {
-    const matchesSearch =
-      order.cliente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.id.toLowerCase().includes(searchTerm.toLowerCase());
+  const handleCambiarEstado = async (
+    pedidoId: string,
+    nuevoEstado: Pedido["estado"],
+  ) => {
+    const resultado = await cambiarEstado(pedidoId, nuevoEstado);
+    if (!resultado.success) {
+      alert("Error: " + resultado.error);
+    }
+  };
 
-    const matchesTab =
-      activeTab === "todos" ||
-      (activeTab === "confirmados" && order.estado === "confirmado") ||
-      (activeTab === "preparados" && order.estado === "preparado") ||
-      (activeTab === "entregados" && order.estado === "entregado");
+  // Filtrar pedidos
+  const pedidosFiltrados = pedidos.filter((pedido) => {
+    const matchEstado =
+      filtroEstado === "todos" || pedido.estado === filtroEstado;
+    const matchBusqueda =
+      pedido.clientes?.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+      pedido.id.toLowerCase().includes(busqueda.toLowerCase()) ||
+      pedido.clientes?.telefono.includes(busqueda);
 
-    return matchesSearch && matchesTab;
+    return matchEstado && matchBusqueda;
   });
 
+  // Badge de estado con colores
+  const getEstadoBadge = (estado: Pedido["estado"]) => {
+    const estilos = {
+      borrador: "bg-gray-100 text-gray-800",
+      confirmado: "bg-yellow-100 text-yellow-800",
+      preparado: "bg-blue-100 text-blue-800",
+      entregado: "bg-green-100 text-green-800",
+      cancelado: "bg-red-100 text-red-800",
+    };
+
+    const iconos = {
+      borrador: "📝",
+      confirmado: "✅",
+      preparado: "📦",
+      entregado: "🚚",
+      cancelado: "❌",
+    };
+
+    return (
+      <span
+        className={`px-3 py-1 rounded-full text-xs font-medium ${estilos[estado]}`}
+      >
+        {iconos[estado]} {estado.charAt(0).toUpperCase() + estado.slice(1)}
+      </span>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="p-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h1>Pedidos</h1>
-        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
-          <Plus size={16} className="mr-2" />
-          Nuevo Pedido Manual
-        </Button>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Pedidos</h1>
+        <div className="flex gap-2">
+          <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+            {pedidos.length} pedidos totales
+          </span>
+        </div>
       </div>
 
-      {/* Search and Filters */}
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={20}
-          />
-          <Input
-            type="text"
-            placeholder="Buscar por cliente o ID de pedido..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        <Button variant="outline" className="md:w-auto">
-          <Filter size={16} className="mr-2" />
-          Filtrar por Estado
-        </Button>
+      {/* Filtros */}
+      <div className="mb-6 flex gap-4">
+        <input
+          type="text"
+          placeholder="🔍 Buscar por cliente, teléfono o ID..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          className="flex-1 max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+        />
+        <select
+          value={filtroEstado}
+          onChange={(e) => setFiltroEstado(e.target.value as EstadoFilter)}
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+        >
+          <option value="todos">Todos los estados</option>
+          <option value="borrador">Borrador</option>
+          <option value="confirmado">Confirmado</option>
+          <option value="preparado">Preparado</option>
+          <option value="entregado">Entregado</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
       </div>
 
-      {/* Status Flow */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between max-w-3xl mx-auto">
-          <div className="flex flex-col items-center">
-            <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mb-2">
-              <span className="text-yellow-600">📋</span>
-            </div>
-            <span className="text-xs text-gray-600">Recibido</span>
-          </div>
-          <div className="flex-1 h-1 bg-gray-200 mx-2" />
-          <div className="flex flex-col items-center">
-            <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mb-2">
-              <span className="text-yellow-600">✓</span>
-            </div>
-            <span className="text-xs text-gray-600">Confirmado</span>
-          </div>
-          <div className="flex-1 h-1 bg-gray-200 mx-2" />
-          <div className="flex flex-col items-center">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-2">
-              <span className="text-blue-600">📦</span>
-            </div>
-            <span className="text-xs text-gray-600">Preparado</span>
-          </div>
-          <div className="flex-1 h-1 bg-gray-200 mx-2" />
-          <div className="flex flex-col items-center">
-            <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-2">
-              <span className="text-emerald-600">🚚</span>
-            </div>
-            <span className="text-xs text-gray-600">Entregado</span>
-          </div>
+      {/* Tabs de estados rápidos */}
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+        {["todos", "confirmado", "preparado", "entregado"].map((estado) => {
+          const count =
+            estado === "todos"
+              ? pedidos.length
+              : pedidos.filter((p) => p.estado === estado).length;
+
+          return (
+            <button
+              key={estado}
+              onClick={() => setFiltroEstado(estado as EstadoFilter)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                filtroEstado === estado
+                  ? "bg-green-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              {estado.charAt(0).toUpperCase() + estado.slice(1)} ({count})
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Tabla de pedidos */}
+      {pedidosFiltrados.length === 0 ? (
+        <div className="bg-white rounded-lg shadow p-12 text-center text-gray-500">
+          <p className="text-lg mb-2">No hay pedidos</p>
+          <p className="text-sm">
+            {busqueda || filtroEstado !== "todos"
+              ? "Probá con otros filtros"
+              : "Los pedidos de WhatsApp aparecerán acá"}
+          </p>
         </div>
-      </Card>
-
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="todos">Todos</TabsTrigger>
-          <TabsTrigger value="confirmados">Confirmados</TabsTrigger>
-          <TabsTrigger value="preparados">Preparados</TabsTrigger>
-          <TabsTrigger value="entregados">Entregados</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={activeTab} className="mt-6">
-          <Card>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left p-4 text-sm text-gray-600">
-                      ID Pedido
-                    </th>
-                    <th className="text-left p-4 text-sm text-gray-600">
-                      Cliente
-                    </th>
-                    <th className="text-left p-4 text-sm text-gray-600">
-                      Productos
-                    </th>
-                    <th className="text-left p-4 text-sm text-gray-600">
-                      Total
-                    </th>
-                    <th className="text-left p-4 text-sm text-gray-600">
-                      Estado
-                    </th>
-                    <th className="text-left p-4 text-sm text-gray-600">
-                      Acciones
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredOrders.map((order, index) => (
-                    <tr
-                      key={order.id}
-                      className={`border-b border-gray-100 hover:bg-gray-50 ${
-                        index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
-                      }`}
+      ) : (
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Cliente
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Productos
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Total
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Estado
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Fecha
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {pedidosFiltrados.map((pedido) => (
+                <tr key={pedido.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-mono text-gray-500">
+                      {pedido.id.slice(0, 8)}...
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-medium text-gray-900">
+                      {pedido.clientes?.nombre || "Sin nombre"}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {pedido.clientes?.telefono}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm text-gray-900">
+                      {pedido.pedido_items?.length || 0} productos
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {pedido.pedido_items
+                        ?.slice(0, 2)
+                        .map((item) => item.productos?.nombre)
+                        .join(", ")}
+                      {(pedido.pedido_items?.length || 0) > 2 && "..."}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-semibold text-gray-900">
+                      ${pedido.total}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {getEstadoBadge(pedido.estado)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {new Date(pedido.created_at).toLocaleDateString("es-UY")}
+                    <br />
+                    <span className="text-xs">
+                      {new Date(pedido.created_at).toLocaleTimeString("es-UY", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                    <button
+                      onClick={() => setPedidoSeleccionado(pedido)}
+                      className="text-green-600 hover:text-green-900 mr-3"
                     >
-                      <td className="p-4 text-sm font-mono">{order.id}</td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">{order.cliente}</span>
-                          <Phone size={14} className="text-emerald-600" />
-                        </div>
-                      </td>
-                      <td className="p-4 text-sm text-gray-600 max-w-[200px] truncate">
-                        {order.productos}
-                      </td>
-                      <td className="p-4 text-sm">${order.total}</td>
-                      <td className="p-4">
-                        <Badge
-                          className={
-                            order.estado === "entregado"
-                              ? "bg-emerald-600 text-white"
-                              : order.estado === "preparado"
-                              ? "bg-blue-600 text-white"
-                              : "bg-yellow-500 text-white"
+                      👁️ Ver
+                    </button>
+                    {pedido.estado !== "entregado" &&
+                      pedido.estado !== "cancelado" && (
+                        <select
+                          value={pedido.estado}
+                          onChange={(e) =>
+                            handleCambiarEstado(
+                              pedido.id,
+                              e.target.value as Pedido["estado"],
+                            )
                           }
+                          className="text-sm border border-gray-300 rounded px-2 py-1"
                         >
-                          {order.estado}
-                        </Badge>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-2">
-                          <button className="p-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded">
-                            <Eye size={16} />
-                          </button>
-                          <button className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded">
-                            <Edit size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                          <option value="confirmado">Confirmado</option>
+                          <option value="preparado">Preparado</option>
+                          <option value="entregado">Entregado</option>
+                          <option value="cancelado">Cancelar</option>
+                        </select>
+                      )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Modal de detalle (simplificado) */}
+      {pedidoSeleccionado && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setPedidoSeleccionado(null)}
+        >
+          <div
+            className="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-start mb-4">
+              <h2 className="text-xl font-bold">Detalle del Pedido</h2>
+              <button
+                onClick={() => setPedidoSeleccionado(null)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
             </div>
 
-            {/* Pagination */}
-            <div className="p-4 border-t border-gray-200 flex items-center justify-between">
-              <span className="text-sm text-gray-600">
-                Mostrando {filteredOrders.length} de {allOrders.length} pedidos
-              </span>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  Anterior
-                </Button>
-                <Button variant="outline" size="sm">
-                  Siguiente
-                </Button>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-gray-500">Cliente</p>
+                <p className="font-medium">
+                  {pedidoSeleccionado.clientes?.nombre}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {pedidoSeleccionado.clientes?.telefono}
+                </p>
               </div>
+
+              <div>
+                <p className="text-sm text-gray-500 mb-2">Productos</p>
+                <div className="space-y-2">
+                  {pedidoSeleccionado.pedido_items?.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex justify-between bg-gray-50 p-3 rounded"
+                    >
+                      <span>{item.productos?.nombre}</span>
+                      <span className="font-medium">
+                        {item.cantidad} {item.productos?.unidad} × $
+                        {item.precio_unitario} = $
+                        {item.cantidad * item.precio_unitario}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Total</span>
+                  <span>${pedidoSeleccionado.total}</span>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm text-gray-500">Estado actual</p>
+                {getEstadoBadge(pedidoSeleccionado.estado)}
+              </div>
+
+              {pedidoSeleccionado.observaciones && (
+                <div>
+                  <p className="text-sm text-gray-500">Observaciones</p>
+                  <p className="text-gray-700">
+                    {pedidoSeleccionado.observaciones}
+                  </p>
+                </div>
+              )}
             </div>
-          </Card>
-        </TabsContent>
-      </Tabs>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
