@@ -29,7 +29,7 @@ export function ConfiguracionScreen() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="nombre">Nombre completo</Label>
-              <Input id="nombre" defaultValue="Juan Delgado" />
+              <Input id="nombre" defaultValue="Laura Rhodas" />
             </div>
             <div>
               <Label htmlFor="email">Email</Label>

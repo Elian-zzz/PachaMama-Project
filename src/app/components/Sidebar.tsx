@@ -118,10 +118,10 @@ export function Sidebar({ activeScreen, onNavigate }: SidebarProps) {
         <div className="p-4 border-t border-gray-200">
           <div className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer">
             <div className="w-10 h-10 bg-emerald-600 text-white rounded-full flex items-center justify-center">
-              JD
+              LR
             </div>
             <div className="flex-1">
-              <div className="text-sm">Juan Delgado</div>
+              <div className="text-sm">Laura Rhodas</div>
               <div className="text-xs text-gray-500">Administrador</div>
             </div>
           </div>
