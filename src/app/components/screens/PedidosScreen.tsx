@@ -1,17 +1,19 @@
 // src/app/screens/Orders.tsx
 import { useState } from "react";
+import { NuevoPedidoModal } from "../NuevoPedidoModal";
 import { usePedidos } from "../../../hooks/useSupabaseData";
 import { Pedido } from "../../../services/supabase";
 
 type EstadoFilter = "todos" | Pedido["estado"];
 
 export function PedidosScreen() {
-  const { pedidos, loading, cambiarEstado } = usePedidos();
+  const { pedidos, loading, cambiarEstado, refetch } = usePedidos();
   const [filtroEstado, setFiltroEstado] = useState<EstadoFilter>("todos");
   const [busqueda, setBusqueda] = useState("");
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState<Pedido | null>(
     null,
   );
+  const [mostrarModal, setMostrarModal] = useState(false);
 
   const handleCambiarEstado = async (
     pedidoId: string,
@@ -75,13 +77,25 @@ export function PedidosScreen() {
   return (
     <div className="p-6">
       {/* Header */}
+
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Pedidos</h1>
-        <div className="flex gap-2">
-          <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-            {pedidos.length} pedidos totales
-          </span>
-        </div>
+        <button
+          onClick={() => setMostrarModal(true)}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2 font-medium"
+        >
+          + Nuevo Pedido Manual
+        </button>
+
+        {mostrarModal && (
+          <NuevoPedidoModal
+            onClose={() => setMostrarModal(false)}
+            onPedidoCreado={() => {
+              setMostrarModal(false);
+              refetch(); // recarga la lista de pedidos
+            }}
+          />
+        )}
       </div>
 
       {/* Filtros */}

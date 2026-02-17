@@ -20,7 +20,7 @@ export function Sidebar({ activeScreen, onNavigate }: SidebarProps) {
 
   const menuItems = [
     { id: "dashboard", icon: Home, label: "Dashboard", badge: null },
-    { id: "pedidos", icon: ShoppingCart, label: "Pedidos", badge: "3" },
+    { id: "pedidos", icon: ShoppingCart, label: "Pedidos", badge: null },
     { id: "clientes", icon: Users, label: "Clientes", badge: null },
     { id: "productos", icon: Leaf, label: "Productos", badge: null },
     { id: "finanzas", icon: DollarSign, label: "Finanzas", badge: null },
