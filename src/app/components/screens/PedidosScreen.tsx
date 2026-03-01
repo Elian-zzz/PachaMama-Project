@@ -3,6 +3,7 @@ import { useState } from "react";
 import { NuevoPedidoModal } from "../NuevoPedidoModal";
 import { usePedidos } from "../../../hooks/useSupabaseData";
 import { Pedido } from "../../../services/supabase";
+import { toast } from "sonner";
 
 type EstadoFilter = "todos" | Pedido["estado"];
 
@@ -20,8 +21,10 @@ export function PedidosScreen() {
     nuevoEstado: Pedido["estado"],
   ) => {
     const resultado = await cambiarEstado(pedidoId, nuevoEstado);
-    if (!resultado.success) {
-      alert("Error: " + resultado.error);
+    if (resultado.success) {
+      toast.success(`Estado actualizado a "${nuevoEstado}"`);
+    } else {
+      toast.error("Error: " + resultado.error);
     }
   };
 

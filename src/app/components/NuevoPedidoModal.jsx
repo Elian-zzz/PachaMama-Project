@@ -1,6 +1,7 @@
 // src/app/components/NuevoPedidoModal.jsx
 import { useState, useEffect } from "react";
 import { supabase } from "../../services/supabase";
+import { toast } from "sonner";
 
 export function NuevoPedidoModal({ onClose, onPedidoCreado }) {
   const [step, setStep] = useState(1); // 1: cliente, 2: productos, 3: confirmar
@@ -72,11 +73,11 @@ export function NuevoPedidoModal({ onClose, onPedidoCreado }) {
   // Guardar pedido en Supabase
   const handleGuardar = async () => {
     if (!clienteSeleccionado) {
-      alert("Seleccioná un cliente");
+      toast.warning("Seleccioná un cliente");
       return;
     }
     if (items.length === 0) {
-      alert("Agregá al menos un producto");
+      toast.warning("Agregá al menos un producto");
       return;
     }
 
@@ -116,7 +117,7 @@ export function NuevoPedidoModal({ onClose, onPedidoCreado }) {
       onClose();
     } catch (error) {
       console.error("Error creando pedido:", error);
-      alert("Error al crear el pedido: " + error.message);
+      toast.error("Error al crear el pedido: " + error.message);
     } finally {
       setGuardando(false);
     }
@@ -415,11 +416,11 @@ export function NuevoPedidoModal({ onClose, onPedidoCreado }) {
               <button
                 onClick={() => {
                   if (step === 1 && !clienteSeleccionado) {
-                    alert("Seleccioná un cliente para continuar");
+                    toast.warning("Seleccioná un cliente para continuar");
                     return;
                   }
                   if (step === 2 && items.length === 0) {
-                    alert("Agregá al menos un producto");
+                    toast.warning("Agregá al menos un producto");
                     return;
                   }
                   setStep(step + 1);
@@ -448,9 +449,5 @@ export function NuevoPedidoModal({ onClose, onPedidoCreado }) {
         </div>
       </div>
     </div>
-
-            
-
-
   );
 }

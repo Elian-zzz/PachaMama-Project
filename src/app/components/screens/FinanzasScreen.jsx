@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-
+import { toast } from "sonner";
 // Helper: obtener lunes y domingo de la semana actual
 function getSemanActual() {
   const hoy = new Date();
@@ -60,11 +60,11 @@ export function FinanzasScreen() {
 
   const handleCrearGasto = async () => {
     if (!formGasto.nombre.trim()) {
-      alert("El nombre del gasto es obligatorio");
+      toast.error("El nombre del gasto es obligatorio");
       return;
     }
     if (!formGasto.monto || formGasto.monto <= 0) {
-      alert("El monto debe ser mayor a 0");
+      toast.error("El monto debe ser mayor a 0");
       return;
     }
 
@@ -88,7 +88,7 @@ export function FinanzasScreen() {
       });
       finanzas.refetch();
     } else {
-      alert("Error al guardar: " + resultado.error);
+      toast.error("Error al guardar: " + resultado.error);
     }
     setGuardandoGasto(false);
   };

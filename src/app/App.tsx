@@ -1,6 +1,8 @@
+// src/app/App.tsx
 import { useState } from "react";
 import { Toaster } from "@/app/components/ui/sonner";
 import { Sidebar } from "@/app/components/Sidebar";
+import { ConfirmDialogProvider } from "@/app/components/ui/ConfirmDialog";
 import { DashboardScreen } from "@/app/components/screens/DashboardScreen";
 import { PedidosScreen } from "@/app/components/screens/PedidosScreen";
 import { ClientesScreen } from "@/app/components/screens/ClientesScreen";
@@ -32,19 +34,14 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Toaster />
-      {/* Sidebar */}
+      <Toaster position="top-right" richColors />
+      <ConfirmDialogProvider />
       <Sidebar activeScreen={activeScreen} onNavigate={setActiveScreen} />
-
-      {/* Main Content */}
       <main className="flex-1 lg:ml-0 overflow-x-hidden">
         <div className="p-6 lg:p-8 max-w-[1600px] mx-auto">
           {renderScreen()}
         </div>
       </main>
-
-      {/* Toast Notifications */}
-      <Toaster position="top-right" />
     </div>
   );
 }

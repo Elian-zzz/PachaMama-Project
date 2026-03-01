@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useClientes } from "../../../hooks/useSupabaseData";
 import { Cliente } from "../../../services/supabase";
+import { toast } from "sonner";
+import { useConfirm } from "../ui/ConfirmDialog";
 
 export function ClientesScreen() {
   const { clientes, loading, crear, actualizar, eliminar } = useClientes();
@@ -14,45 +16,55 @@ export function ClientesScreen() {
     notas: "",
   });
   const [busqueda, setBusqueda] = useState("");
+  const { confirm } = useConfirm();
 
   const handleGuardar = async () => {
-    // Validación básica
     if (!formData.nombre?.trim()) {
-      alert("El nombre es obligatorio");
+      toast.error("El nombre es obligatorio");
       return;
     }
     if (!formData.telefono?.trim()) {
-      alert("El teléfono es obligatorio");
+      toast.error("El teléfono es obligatorio");
       return;
     }
 
     if (editando) {
       const resultado = await actualizar(editando, formData);
       if (resultado.success) {
+        toast.success("Cliente actualizado");
         setEditando(null);
         resetForm();
       } else {
-        alert("Error: " + resultado.error);
+        toast.error("Error: " + resultado.error);
       }
     } else {
       const resultado = await crear(
         formData as Omit<Cliente, "id" | "created_at">,
       );
       if (resultado.success) {
+        toast.success("Cliente creado");
         setNuevoCliente(false);
         resetForm();
       } else {
-        alert("Error: " + resultado.error);
+        toast.error("Error: " + resultado.error);
       }
     }
   };
 
   const handleEliminar = async (id: string, nombre: string) => {
-    if (!confirm(`¿Seguro que querés eliminar a ${nombre}?`)) return;
+    const ok = await confirm({
+      titulo: "Eliminar cliente",
+      mensaje: `¿Seguro que querés eliminar a ${nombre}? Esta acción no se puede deshacer.`,
+      labelConfirmar: "Sí, eliminar",
+      variante: "danger",
+    });
+    if (!ok) return;
 
     const resultado = await eliminar(id);
-    if (!resultado.success) {
-      alert("Error: " + resultado.error);
+    if (resultado.success) {
+      toast.success(`${nombre} eliminado`);
+    } else {
+      toast.error("Error: " + resultado.error);
     }
   };
 

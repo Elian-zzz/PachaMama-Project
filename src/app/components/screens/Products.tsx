@@ -2,6 +2,9 @@
 import { useState } from "react";
 import { useProductos } from "../../../hooks/useSupabaseData";
 import { Producto } from "../../../services/supabase";
+import { toast } from "sonner";
+import { useConfirm } from "../ui/ConfirmDialog";
+import { ListaWhatsappModal } from "../ListaWhatsappModal";
 
 export function Products() {
   const { productos, loading, crear, actualizar, eliminar } = useProductos();
@@ -14,23 +17,34 @@ export function Products() {
     disponible: true,
     observaciones: "",
   });
+  const { confirm } = useConfirm();
+  const [mostrarListaModal, setMostrarListaModal] = useState(false);
 
   const handleGuardar = async () => {
+    if (!formData.nombre?.trim()) {
+      toast.error("El nombre del producto es obligatorio");
+      return;
+    }
+    if (!formData.precio || formData.precio <= 0) {
+      toast.error("El precio debe ser mayor a 0");
+      return;
+    }
+
     if (editando) {
-      // Actualizar existente
       const resultado = await actualizar(editando, formData);
       if (resultado.success) {
+        toast.success("Producto actualizado");
         setEditando(null);
         setFormData({});
       } else {
-        alert("Error: " + resultado.error);
+        toast.error("Error: " + resultado.error);
       }
     } else {
-      // Crear nuevo
       const resultado = await crear(
         formData as Omit<Producto, "id" | "created_at">,
       );
       if (resultado.success) {
+        toast.success("Producto creado");
         setNuevoProducto(false);
         setFormData({
           nombre: "",
@@ -40,17 +54,26 @@ export function Products() {
           observaciones: "",
         });
       } else {
-        alert("Error: " + resultado.error);
+        toast.error("Error: " + resultado.error);
       }
     }
   };
 
   const handleEliminar = async (id: string) => {
-    if (!confirm("¿Seguro que querés eliminar este producto?")) return;
+    const ok = await confirm({
+      titulo: "Eliminar producto",
+      mensaje:
+        "¿Seguro que querés eliminar este producto? Esta acción no se puede deshacer.",
+      labelConfirmar: "Sí, eliminar",
+      variante: "danger",
+    });
+    if (!ok) return;
 
     const resultado = await eliminar(id);
-    if (!resultado.success) {
-      alert("Error: " + resultado.error);
+    if (resultado.success) {
+      toast.success("Producto eliminado");
+    } else {
+      toast.error("Error: " + resultado.error);
     }
   };
 
@@ -91,7 +114,10 @@ export function Products() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Lista de Productos</h1>
         <div className="flex gap-3">
-          <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2">
+          <button
+            onClick={() => setMostrarListaModal(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2 font-medium"
+          >
             📢 Publicar Lista a WhatsApp
           </button>
           <button
@@ -305,6 +331,12 @@ export function Products() {
           </tbody>
         </table>
       </div>
+      {mostrarListaModal && (
+        <ListaWhatsappModal
+          productos={productos}
+          onClose={() => setMostrarListaModal(false)}
+        />
+      )}
     </div>
   );
 }
