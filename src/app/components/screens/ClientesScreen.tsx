@@ -6,7 +6,14 @@ import { toast } from "sonner";
 import { useConfirm } from "../ui/ConfirmDialog";
 
 export function ClientesScreen() {
-  const { clientes, loading, crear, actualizar, eliminar } = useClientes();
+  const {
+    clientes,
+    loading,
+    crear,
+    actualizar,
+    eliminar,
+    verificarDependencias,
+  } = useClientes();
   const [editando, setEditando] = useState<string | null>(null);
   const [nuevoCliente, setNuevoCliente] = useState(false);
   const [formData, setFormData] = useState<Partial<Cliente>>({
@@ -51,7 +58,19 @@ export function ClientesScreen() {
     }
   };
 
+  // Reemplazar handleEliminar completo:
+  // Reemplazar handleEliminar completo:
   const handleEliminar = async (id: string, nombre: string) => {
+    // Verificar si tiene pedidos asociados
+    const { tienePedidos, cantidad } = await verificarDependencias(id);
+
+    if (tienePedidos) {
+      toast.warning(
+        `No se puede eliminar a ${nombre} porque tiene ${cantidad} pedido${cantidad !== 1 ? "s" : ""} asociado${cantidad !== 1 ? "s" : ""}. Si querés darlo de baja, editá sus datos.`,
+      );
+      return;
+    }
+
     const ok = await confirm({
       titulo: "Eliminar cliente",
       mensaje: `¿Seguro que querés eliminar a ${nombre}? Esta acción no se puede deshacer.`,

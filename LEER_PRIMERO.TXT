@@ -1,0 +1,17 @@
+=============================================
+  INSTALACIÓN - PachaMama Dashboard
+=============================================
+
+PRIMERA VEZ (solo una vez):
+1. Doble clic en "crear-acceso-directo.bat"
+   → Esto crea un ícono en tu escritorio
+
+PARA USAR LA APP TODOS LOS DÍAS:
+1. Doble clic en "PachaMama Dashboard" (escritorio)
+2. Esperar que aparezca el navegador (10-15 segundos)
+3. NO cerrar la ventana negra mientras usás la app
+4. Cuando termines: cerrá la ventana negra
+
+=============================================
+¿Problemas? Contactar a [Elian/+598 96 140 030]
+=============================================

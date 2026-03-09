@@ -4,7 +4,7 @@ import {
   Users,
   Leaf,
   DollarSign,
-  Settings,
+  BookOpen,
   Menu,
   X,
 } from "lucide-react";
@@ -24,12 +24,7 @@ export function Sidebar({ activeScreen, onNavigate }: SidebarProps) {
     { id: "clientes", icon: Users, label: "Clientes", badge: null },
     { id: "productos", icon: Leaf, label: "Productos", badge: null },
     { id: "finanzas", icon: DollarSign, label: "Finanzas", badge: null },
-    {
-      id: "configuracion",
-      icon: Settings,
-      label: "Configuración",
-      badge: null,
-    },
+    { id: "configuracion", icon: BookOpen, label: "Manuales", badge: null },
   ];
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);

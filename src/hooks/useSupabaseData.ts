@@ -86,6 +86,16 @@ export function useProductos() {
     cargarProductos();
   }, []);
 
+  const verificarDependenciasProducto = async (
+    id: string,
+  ): Promise<{ tieneItems: boolean; cantidad: number }> => {
+    const { data } = await supabase
+      .from("pedido_items")
+      .select("id", { count: "exact" })
+      .eq("producto_id", id);
+    return { tieneItems: (data?.length ?? 0) > 0, cantidad: data?.length ?? 0 };
+  };
+
   return {
     productos,
     loading,
@@ -94,6 +104,7 @@ export function useProductos() {
     crear: crearProducto,
     actualizar: actualizarProducto,
     eliminar: eliminarProducto,
+    verificarDependencias: verificarDependenciasProducto,
   };
 }
 
@@ -173,6 +184,18 @@ export function useClientes() {
     cargarClientes();
   }, []);
 
+  const verificarDependenciasCliente = async (
+    id: string,
+  ): Promise<{ tienePedidos: boolean; cantidad: number }> => {
+    const { data } = await supabase
+      .from("pedidos")
+      .select("id")
+      .eq("cliente_id", id);
+
+    const cantidad = data?.length ?? 0;
+    return { tienePedidos: cantidad > 0, cantidad };
+  };
+
   return {
     clientes,
     loading,
@@ -181,6 +204,7 @@ export function useClientes() {
     crear: crearCliente,
     actualizar: actualizarCliente,
     eliminar: eliminarCliente,
+    verificarDependencias: verificarDependenciasCliente,
   };
 }
 

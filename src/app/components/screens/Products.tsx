@@ -7,7 +7,14 @@ import { useConfirm } from "../ui/ConfirmDialog";
 import { ListaWhatsappModal } from "../ListaWhatsappModal";
 
 export function Products() {
-  const { productos, loading, crear, actualizar, eliminar } = useProductos();
+  const {
+    productos,
+    loading,
+    crear,
+    actualizar,
+    eliminar,
+    verificarDependencias,
+  } = useProductos();
   const [editando, setEditando] = useState<string | null>(null);
   const [nuevoProducto, setNuevoProducto] = useState(false);
   const [formData, setFormData] = useState<Partial<Producto>>({
@@ -20,6 +27,7 @@ export function Products() {
   const { confirm } = useConfirm();
   const [mostrarListaModal, setMostrarListaModal] = useState(false);
 
+  // Reemplazar handleGuardar — fix del bug de unidad null:
   const handleGuardar = async () => {
     if (!formData.nombre?.trim()) {
       toast.error("El nombre del producto es obligatorio");
@@ -30,8 +38,14 @@ export function Products() {
       return;
     }
 
+    // Garantizar que unidad nunca sea null/undefined
+    const dataParaGuardar = {
+      ...formData,
+      unidad: formData.unidad?.trim() || "kg",
+    };
+
     if (editando) {
-      const resultado = await actualizar(editando, formData);
+      const resultado = await actualizar(editando, dataParaGuardar);
       if (resultado.success) {
         toast.success("Producto actualizado");
         setEditando(null);
@@ -41,7 +55,7 @@ export function Products() {
       }
     } else {
       const resultado = await crear(
-        formData as Omit<Producto, "id" | "created_at">,
+        dataParaGuardar as Omit<Producto, "id" | "created_at">,
       );
       if (resultado.success) {
         toast.success("Producto creado");
@@ -59,7 +73,17 @@ export function Products() {
     }
   };
 
+  // Reemplazar handleEliminar completo:
   const handleEliminar = async (id: string) => {
+    const { tieneItems, cantidad } = await verificarDependencias(id);
+
+    if (tieneItems) {
+      toast.warning(
+        `Este producto no se puede eliminar porque aparece en ${cantidad} pedido${cantidad !== 1 ? "s" : ""}. Podés desactivarlo con el interruptor "Disponible" para que no aparezca en nuevos pedidos.`,
+      );
+      return;
+    }
+
     const ok = await confirm({
       titulo: "Eliminar producto",
       mensaje:
