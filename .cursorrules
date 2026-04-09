@@ -1,0 +1,30 @@
+# Reglas del Proyecto: PachaMama-Project (Retail Management SaaS)
+
+## 🚨 REGLA DE ORO / CORE DIRECTIVE
+**NUNCA SOBRESCRIBIR FUNCIONALIDADES EXISTENTES.** 
+Al solicitar una nueva *feature* o mejora, la IA **DEBE RECUPERAR Y PRESERVAR** el código de las funcionalidades actuales. Si un archivo clave como `App.tsx`, `NuevoPedidoModal.jsx` o cualquier modal debe ser modificado, la IA debe agregar el nuevo código de forma modular o entrelazada mediante *Diffs* cuidadosos. No reemplazar un archivo entero asumiendo que las funciones antiguas ya no existen.
+
+## 🛠️ Stack Tecnológico
+- Frontend: React 19, Vite (SWC), TailwindCSS v4.
+- UI Components: Radix UI, Lucide React, Sonner (Toasts), Recharts.
+- Backend/DB: Supabase completo (Auth, Database).
+
+## 🔒 Funcionalidades Críticas que JAMÁS deben romperse o borrarse
+Al añadir neuvas features, asegúrate de que estas estructuras permanezcan intactas y funcionales:
+
+### 1. Gestión de Ofertas y Stock
+- La base de datos y la interfaz dependen de las tablas `Producto` (con `stock`), `StockMovimiento` y `Oferta`.
+- Los cálculos en los pedidos deben continuar respetando las promociones (`tipo_oferta`: "exacta" o "minima") y reducir/restaurar el stock de manera correcta en Supabase al crear o cancelar un pedido.
+
+### 2. Mensajes Estructurados para WhatsApp con Memoria en Supabase
+- El sistema cuenta (o debe contar) con un módulo (ej. `ListaWhatsappModal.tsx` o similar) para formatear pedidos/catálogos, permitiendo al usuario **Copiar y Pegar directo a WhatsApp**.
+- Al enviar/copiar este mensaje, debe guardarse la "memoria" o registro del mensaje generado en Supabase para tener historial con cada cliente. Esta feature no debe ser eliminada por limpiar o re-hacer módulos de pedido.
+
+### 3. Persistencia Local y Autónoma
+- Pantallas orientadas al teclado/ratón optimizadas para "Kioscos" locales. Debe mantenerse la agilidad visual y de clics en todo momento.
+
+## 📝 Pasos Obligatorios para la IA antes de escribir código:
+1. **Analizar Dependencias:** Si vas a modificar un Modal (`NuevoPedidoModal`, etc.), lee su contenido completo primero.
+2. **Identificar "Features Antiguas":** Busca bloques que manejen WhatsApp, ofertas o stock. 
+3. **Integrar, no Destruir:** Inserta tu nueva solución sumando estados (ej. `useState`) o añadiendo botones adicionales en la UI, sin borrar los botones de "Copiar para WhatsApp" o los selectores de "Ofertas".
+4. **Solicitar Confirmación:** Si dos lógicas son incompatibles, pregúntale al usuario cómo quiere fusionarlas ANTES de borrar código.

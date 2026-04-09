@@ -6,6 +6,8 @@ import {
   Cliente,
   Pedido,
   Gasto,
+  StockMovimiento,
+  Oferta,
 } from "../services/supabase";
 
 // ==========================================
@@ -441,4 +443,309 @@ export function useFinanzas(fechaDesde?: string, fechaHasta?: string) {
   }, [fechaDesde, fechaHasta]);
 
   return { ...datos, loading, refetch: calcularFinanzas };
+}
+
+export function useStock() {
+  const [movimientos, setMovimientos] = useState<StockMovimiento[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const cargarMovimientos = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("stock_movimientos")
+        .select(`*, productos (id, nombre, unidad, stock)`)
+        .order("created_at", { ascending: false })
+        .limit(200);
+      if (error) throw error;
+      setMovimientos(data || []);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Registrar entrada de stock (compra de mercadería)
+  const registrarEntrada = async (
+    producto_id: string,
+    cantidad: number,
+    notas?: string,
+  ) => {
+    try {
+      // 1. Insertar movimiento
+      const { error: movErr } = await supabase
+        .from("stock_movimientos")
+        .insert([
+          { producto_id, tipo: "entrada", cantidad, notas: notas || null },
+        ]);
+      if (movErr) throw movErr;
+
+      // 2. Actualizar stock en producto
+      const { data: prod } = await supabase
+        .from("productos")
+        .select("stock")
+        .eq("id", producto_id)
+        .single();
+      const stockActual = prod?.stock ?? 0;
+      const { error: updErr } = await supabase
+        .from("productos")
+        .update({ stock: stockActual + cantidad })
+        .eq("id", producto_id);
+      if (updErr) throw updErr;
+
+      await cargarMovimientos();
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  // Descontar stock al confirmar pedido (llamado desde NuevoPedidoModal)
+  const descontarStockPorPedido = async (
+    pedido_id: string,
+    items: { producto_id: string; cantidad: number }[],
+  ) => {
+    try {
+      for (const item of items) {
+        // Movimiento de salida
+        const { error: movErr } = await supabase
+          .from("stock_movimientos")
+          .insert([
+            {
+              producto_id: item.producto_id,
+              tipo: "salida",
+              cantidad: item.cantidad,
+              pedido_id,
+              notas: "Salida por pedido",
+            },
+          ]);
+        if (movErr) throw movErr;
+
+        // Actualizar stock
+        const { data: prod } = await supabase
+          .from("productos")
+          .select("stock")
+          .eq("id", item.producto_id)
+          .single();
+        const stockActual = prod?.stock ?? 0;
+        await supabase
+          .from("productos")
+          .update({ stock: stockActual - item.cantidad })
+          .eq("id", item.producto_id);
+      }
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  // Devolver stock si se cancela un pedido
+  const devolverStockPorCancelacion = async (pedido_id: string) => {
+    try {
+      // Buscar salidas asociadas a este pedido
+      const { data: salidas } = await supabase
+        .from("stock_movimientos")
+        .select("producto_id, cantidad")
+        .eq("pedido_id", pedido_id)
+        .eq("tipo", "salida");
+
+      if (!salidas || salidas.length === 0) return { success: true };
+
+      for (const salida of salidas) {
+        // Registrar devolución
+        await supabase.from("stock_movimientos").insert([
+          {
+            producto_id: salida.producto_id,
+            tipo: "devolucion",
+            cantidad: salida.cantidad,
+            pedido_id,
+            notas: "Devolución por cancelación de pedido",
+          },
+        ]);
+
+        // Restaurar stock
+        const { data: prod } = await supabase
+          .from("productos")
+          .select("stock")
+          .eq("id", salida.producto_id)
+          .single();
+        const stockActual = prod?.stock ?? 0;
+        await supabase
+          .from("productos")
+          .update({ stock: stockActual + salida.cantidad })
+          .eq("id", salida.producto_id);
+      }
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  // Ajuste manual de stock (corrección directa)
+  const ajustarStock = async (
+    producto_id: string,
+    nuevo_stock: number,
+    notas?: string,
+  ) => {
+    try {
+      const { data: prod } = await supabase
+        .from("productos")
+        .select("stock")
+        .eq("id", producto_id)
+        .single();
+      const stockActual = prod?.stock ?? 0;
+      const diferencia = nuevo_stock - stockActual;
+
+      await supabase.from("stock_movimientos").insert([
+        {
+          producto_id,
+          tipo: "ajuste",
+          cantidad: Math.abs(diferencia),
+          notas: notas || `Ajuste manual: ${stockActual} → ${nuevo_stock}`,
+        },
+      ]);
+
+      await supabase
+        .from("productos")
+        .update({ stock: nuevo_stock })
+        .eq("id", producto_id);
+
+      await cargarMovimientos();
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  useEffect(() => {
+    cargarMovimientos();
+  }, []);
+
+  return {
+    movimientos,
+    loading,
+    error,
+    refetch: cargarMovimientos,
+    registrarEntrada,
+    descontarStockPorPedido,
+    devolverStockPorCancelacion,
+    ajustarStock,
+  };
+}
+
+// ==========================================
+// HOOK: Ofertas
+// ==========================================
+export function useOfertas() {
+  const [ofertas, setOfertas] = useState<Oferta[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const cargarOfertas = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("ofertas")
+        .select(`*, productos (id, nombre, unidad, precio)`)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      setOfertas(data || []);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const crearOferta = async (oferta: Omit<Oferta, "id" | "created_at">) => {
+    try {
+      const { error } = await supabase.from("ofertas").insert([oferta]);
+      if (error) throw error;
+      await cargarOfertas();
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const toggleOferta = async (id: string, activa: boolean) => {
+    try {
+      const { error } = await supabase
+        .from("ofertas")
+        .update({ activa })
+        .eq("id", id);
+      if (error) throw error;
+      await cargarOfertas();
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const eliminarOferta = async (id: string) => {
+    try {
+      const { error } = await supabase.from("ofertas").delete().eq("id", id);
+      if (error) throw error;
+      await cargarOfertas();
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  // Utilidad: dada una lista de productos con cantidad, retorna las ofertas aplicables
+  const evaluarOfertas = (
+    items: { producto_id: string; cantidad: number }[],
+  ): Map<string, { oferta: Oferta; precioFinal: number; ahorro: number }> => {
+    const resultado = new Map();
+    const ofertasActivas = ofertas.filter((o) => o.activa);
+
+    for (const item of items) {
+      const ofertaAplicable = ofertasActivas.find((o) => {
+        if (o.producto_id !== item.producto_id) return false;
+        if (o.tipo_oferta === "exacta")
+          return item.cantidad === o.cantidad_condicion;
+        if (o.tipo_oferta === "minima")
+          return item.cantidad >= o.cantidad_condicion;
+        return false;
+      });
+
+      if (ofertaAplicable) {
+        const precioNormal =
+          (ofertaAplicable.productos?.precio ?? 0) * item.cantidad;
+        let precioFinal: number;
+
+        if (ofertaAplicable.tipo_oferta === "exacta") {
+          precioFinal = ofertaAplicable.precio_oferta; // precio total fijo
+        } else {
+          // minima: precio por unidad * cantidad
+          precioFinal = ofertaAplicable.precio_oferta * item.cantidad;
+        }
+
+        resultado.set(item.producto_id, {
+          oferta: ofertaAplicable,
+          precioFinal,
+          ahorro: precioNormal - precioFinal,
+        });
+      }
+    }
+    return resultado;
+  };
+
+  useEffect(() => {
+    cargarOfertas();
+  }, []);
+
+  return {
+    ofertas,
+    loading,
+    error,
+    refetch: cargarOfertas,
+    crearOferta,
+    toggleOferta,
+    eliminarOferta,
+    evaluarOfertas,
+  };
 }

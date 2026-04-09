@@ -44,12 +44,12 @@ export function useListaWhatsapp(productos: Producto[]) {
       setGuardando(true);
       const { error } = await supabase
         .from("config_lista_whatsapp")
-        .update({
+        .upsert({
+          id: CONFIG_ID,
           encabezado: config.encabezado,
           pie: config.pie,
           updated_at: new Date().toISOString(),
-        })
-        .eq("id", CONFIG_ID);
+        });
 
       if (error) throw error;
       return { success: true };

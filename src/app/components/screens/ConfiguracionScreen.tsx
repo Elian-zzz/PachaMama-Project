@@ -58,39 +58,60 @@ const MANUALES: Manual[] = [
     ],
   },
   {
-    id: "clientes",
-    emoji: "👥",
-    titulo: "Clientes",
-    descripcion: "Cómo gestionar el directorio de clientes",
-    color: "text-blue-700",
-    colorBg: "bg-blue-50",
-    colorBorde: "border-blue-200",
+    id: "stock",
+    emoji: "📦",
+    titulo: "Inventario y Stock",
+    descripcion: "Acumulación automática y ajustes manuales",
+    color: "text-indigo-700",
+    colorBg: "bg-indigo-50",
+    colorBorde: "border-indigo-200",
     pasos: [
       {
-        texto: 'Ir a la sección "Clientes" en el menú de la izquierda.',
-      },
-      {
-        texto: 'Para agregar un cliente nuevo: hacé clic en "+ Nuevo Cliente".',
+        texto:
+          "El stock de PachaMama funciona con un sistema de 'Movimientos', garantizando un registro preciso y acumulativo.",
       },
       {
         texto:
-          "Completá el formulario: nombre y teléfono son obligatorios. Dirección y notas son opcionales.",
-        tip: 'El campo "Notas" es útil para recordar preferencias del cliente (ej: "prefiere entrega por la tarde").',
-      },
-      {
-        texto: 'Hacé clic en "Guardar" para confirmar.',
+          "Descuento automático: Cada vez que completas o confirmas un pedido manualmente, el sistema restará el inventario necesario. No tienes que hacerlo tú.",
       },
       {
         texto:
-          "Para buscar un cliente: usá la barra de búsqueda — podés buscar por nombre o teléfono.",
-      },
-      {
-        texto: "Para editar los datos de un cliente: hacé clic en el ícono ✏️.",
+          "Devolución automática: Si alguien se arrepiente y un pedido cambia su estado a 'Cancelado', PachaMama revertirá los productos exactos regresándolos al stock.",
+        tip: "Para re-utilizar la devolución en ventas inmediatas, simplemente cancela arrastrando el estado del pedido a cancelado.",
       },
       {
         texto:
-          "Para eliminar un cliente: hacé clic en 🗑️ y confirmá la acción.",
-        tip: "Solo eliminá clientes si están duplicados o son errores. Los pedidos asociados al cliente se pueden ver afectados.",
+          "Ajuste Manual Rápido: Sirve para decirle al sistema cuántas unidades REALES tienes físicamente.",
+        tip: "Utiliza la opción de 'Ajuste manual' cuando llegue nueva mercadería del proveedor o si encuentras mermas (pérdida o daños) y necesitas sobreescribir el acumulado actual a la realidad.",
+      },
+    ],
+  },
+  {
+    id: "ofertas",
+    emoji: "🏷️",
+    titulo: "Ofertas y Promociones",
+    descripcion: "Configuración de descuentos por volumen de compras",
+    color: "text-pink-700",
+    colorBg: "bg-pink-50",
+    colorBorde: "border-pink-200",
+    pasos: [
+      {
+        texto:
+          "Las promociones se aplican mágicamente de forma visual cuando creas un Pedido Nuevo — si se cumple la condición, el texto se pone verde indicando que el cliente aplica para la rebaja.",
+      },
+      {
+        texto:
+          'Ofertas "Cantidad Exacta": Ideales para "Promos cerradas". El sistema aplicará el precio únicamente cuando el usuario seleccione EXACTAMENTE esa cantidad, ni más ni menos.',
+        tip: "Ejemplo de Exacta: Promo del mes: «Llevando 3 Kg de acelga = $150 final». Si compra 4 kilos, vuelve al precio normal.",
+      },
+      {
+        texto:
+          'Ofertas "Cantidad Mínima": Sirve para rebajas por mayor. A partir de esa cantidad en adelante para el mismo producto, todo correrá bajo el nuevo precio especial por unidad.',
+        tip: "Ejemplo Mínima: A partir de 10 unidades de Limón, el valor unitario cae de $20 a solo $12 para cada limón que exceda de 10.",
+      },
+      {
+        texto:
+          "Para activar temporalmente o suspender una oferta, simplemente utiliza el botón de Activa/Inactiva desde el panel de ofertas, en lugar de borrarla definitivamente.",
       },
     ],
   },
@@ -116,27 +137,23 @@ const MANUALES: Manual[] = [
       },
       {
         texto:
-          "Paso 2 — Agregá los productos y sus cantidades. El total se calcula automáticamente.",
+          "Paso 2 — Agregá los productos y cantidades. Si un producto califica a una oferta el total se descontará de inmediato.",
       },
       {
         texto: 'Paso 3 — Revisá el resumen y hacé clic en "Confirmar Pedido".',
-        tip: 'Podés agregar observaciones generales al pedido (ej: "entregar en portería").',
+        tip: 'Podés agregar observaciones exclusivas al pedido (ej: "entregar en portería, avisar antes").',
       },
       {
         texto:
-          "Para cambiar el estado de un pedido existente: usá el selector de estado en la fila del pedido.",
-        tip: "Los estados disponibles son: Borrador → Confirmado → Preparado → Entregado (o Cancelado).",
-      },
-      {
-        texto:
-          "Para buscar un pedido: usá la barra de búsqueda o filtrá por estado con los botones de filtro.",
+          "Para cambiar el estado de un pedido existente: usá el selector visual en la fila.",
+        tip: "Los estados son: Borrador → Confirmado → Preparado → Entregado → Cancelado.",
       },
     ],
   },
   {
     id: "gastos",
     emoji: "💰",
-    titulo: "Gastos",
+    titulo: "Gastos y Finanzas",
     descripcion: "Cómo registrar y controlar los gastos del negocio",
     color: "text-red-700",
     colorBg: "bg-red-50",
@@ -147,62 +164,69 @@ const MANUALES: Manual[] = [
       },
       {
         texto:
-          "En la sección de gastos, completá el formulario: nombre del gasto, categoría, monto y fecha.",
-        tip: "Las categorías disponibles son: Logística, Compras, Publicidad, Servicios y Otro.",
+          "En la sección de gastos, completá: nombre del gasto, categoría, monto y fecha.",
+        tip: "Las categorías disponibles ordenarán luego tu pastel gráfico analítico: Logística, Compras, Publicidad y Servicios.",
       },
       {
         texto:
-          'El campo "Detalles" es opcional — usalo para agregar más contexto (ej: "compra en mercado central").',
-      },
-      {
-        texto: 'Hacé clic en "Registrar Gasto" para guardar.',
-      },
-      {
-        texto:
-          "Los gastos registrados impactan automáticamente en el cálculo de ganancias del Dashboard y Finanzas.",
-        tip: "Registrá los gastos el mismo día que ocurren para que las métricas sean precisas.",
-      },
-      {
-        texto:
-          "Podés filtrar el período de análisis usando los campos de fecha en la parte superior de la pantalla de Finanzas.",
+          "Los gastos impactan automáticamente en el cálculo de ganancias del Dashboard junto a tus pedidos entregados.",
+        tip: "Registrá los imprevistos que le quiten rentabilidad al mes el mismo día exacto en el que pasen, así los cálculos mensuales son infalibles.",
       },
     ],
   },
   {
     id: "whatsapp",
     emoji: "📲",
-    titulo: "Lista de WhatsApp",
-    descripcion: "Cómo generar y copiar la lista de productos para el grupo",
+    titulo: "Catálogo a WhatsApp",
+    descripcion: "Cómo generar tu lista de Broadcast para el grupo de clientes",
     color: "text-green-700",
     colorBg: "bg-green-50",
     colorBorde: "border-green-200",
     pasos: [
       {
-        texto: 'Ir a la sección "Productos" en el menú de la izquierda.',
+        texto: 'Ir a la sección "Productos" en el menú lateral.',
       },
       {
-        texto: 'Hacé clic en el botón verde "📢 Publicar Lista a WhatsApp".',
-      },
-      {
-        texto:
-          "Se abre un panel con la lista generada automáticamente con todos los productos disponibles.",
+        texto: 'Hacé clic arriba a la derecha en "📢 Publicar Lista a WhatsApp".',
       },
       {
         texto:
-          "Podés editar el texto de encabezado (saludo/introducción) y el pie (cierre/contacto). Estos textos quedan guardados para la próxima vez.",
-        tip: "El texto del encabezado y pie se guarda automáticamente al cerrar el panel.",
+          "El sistema procesa y extrae todos los productos DISPONIBLES de tu tienda omitiendo los vacíos.",
       },
       {
         texto:
-          'Revisá el "Preview del mensaje completo" para ver cómo quedará antes de copiarlo.',
+          "Puedes modificar el Texto Encabezado de Saludo y el Pie de despedida como quieras antes de copiarlo. Esa memoria quedará guardada en la base de datos mágicamente.",
+        tip: "Dile al cliente en tu Saludo la fecha en la que aceptas límite de pedidos. ¡Incrementará el FOMO!",
+      },
+      {
+        texto: 'Hacé clic en "📋 Copiar lista" y pégalo directo en la App.',
+      },
+    ],
+  },
+  {
+    id: "clientes",
+    emoji: "👥",
+    titulo: "Clientes",
+    descripcion: "Cómo gestionar el directorio de fidelización",
+    color: "text-blue-700",
+    colorBg: "bg-blue-50",
+    colorBorde: "border-blue-200",
+    pasos: [
+      {
+        texto: 'Ir a la sección "Clientes" en el menú de la izquierda.',
+      },
+      {
+        texto: 'Para agregar un cliente nuevo: hacé clic en "+ Nuevo Cliente".',
       },
       {
         texto:
-          'Hacé clic en "📋 Copiar lista" — el mensaje completo queda en el portapapeles.',
+          "Es vital capturar el teléfono (WhatsApp) adecuadamente para posibles automatizaciones en el futuro.",
+        tip: 'El campo "Notas" es crucial. Apunta ahí manías del cliente: ("Suele quejarse de la madurez del tomate" o "Le gusta que toquen el timbre flojo").',
       },
       {
-        texto: "Abrí WhatsApp Web, entrá al grupo y pegá el mensaje (Ctrl+V).",
-        tip: 'El botón "Publicar en Pacha-Mama" estará disponible próximamente para envío automático.',
+        texto:
+          "Puedes buscar velozmente clientes por su teléfono tecleando al momento.",
+        tip: "Evita borrar clientes. Si dejan de pedir, simplemente déjalos en tu recámara de base de datos — podrás lanzar campañas futuras para reconquistarlos.",
       },
     ],
   },
@@ -210,16 +234,13 @@ const MANUALES: Manual[] = [
 
 export function ConfiguracionScreen() {
   const [manualAbierto, setManualAbierto] = useState<string | null>(null);
-  const [pasoActivo, setPasoActivo] = useState<number>(0);
 
   const abrirManual = (id: string) => {
     setManualAbierto(id);
-    setPasoActivo(0);
   };
 
   const cerrarManual = () => {
     setManualAbierto(null);
-    setPasoActivo(0);
   };
 
   const manual = MANUALES.find((m) => m.id === manualAbierto);
@@ -228,151 +249,131 @@ export function ConfiguracionScreen() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">📖 Manuales de uso</h1>
+        <h1 className="text-2xl font-bold text-gray-900">📖 Recetario de Ayuda</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Guías paso a paso para usar cada sección de la aplicación
+          Guías completas en un bloque para que domines PachaMama sin pestañear
         </p>
       </div>
 
       {/* Grid de manuales */}
       {!manualAbierto && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {MANUALES.map((m) => (
             <button
               key={m.id}
               onClick={() => abrirManual(m.id)}
-              className={`text-left p-5 rounded-2xl border-2 ${m.colorBg} ${m.colorBorde} hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group`}
+              className={`text-left p-6 flex flex-col justify-between h-full rounded-2xl border ${m.colorBg} border-transparent bg-white shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group`}
             >
-              <div className="text-4xl mb-3">{m.emoji}</div>
-              <h3 className={`text-base font-bold ${m.color} mb-1`}>
-                {m.titulo}
-              </h3>
-              <p className="text-sm text-gray-500 leading-snug">
-                {m.descripcion}
-              </p>
+              <div>
+                <div className="text-4xl mb-4">{m.emoji}</div>
+                <h3 className={`text-lg font-bold ${m.color} mb-2`}>
+                  {m.titulo}
+                </h3>
+                <p className="text-sm text-gray-600 leading-relaxed font-medium">
+                  {m.descripcion}
+                </p>
+              </div>
               <div
-                className={`mt-4 text-xs font-semibold ${m.color} flex items-center gap-1 group-hover:gap-2 transition-all`}
+                className={`mt-6 text-sm font-bold ${m.color} flex items-center gap-2 group-hover:gap-3 transition-all`}
               >
-                Ver manual →
+                Abrir recetario <span className="text-lg">→</span>
               </div>
             </button>
           ))}
         </div>
       )}
 
-      {/* Manual abierto — vista detallada */}
+      {/* Manual abierto — vista detallada tipo Libro/Receta */}
       {manualAbierto && manual && (
-        <div className="max-w-2xl">
-          {/* Volver */}
+        <div className="max-w-3xl mx-auto pb-10">
+          {/* Botón Volver */}
           <button
             onClick={cerrarManual}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 mb-5 transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 mb-6 font-medium transition-colors"
           >
-            ← Volver a los manuales
+            ← Volver a los recetarios
           </button>
 
-          {/* Header del manual */}
-          <div
-            className={`rounded-2xl border-2 ${manual.colorBg} ${manual.colorBorde} p-6 mb-6`}
-          >
-            <div className="text-5xl mb-2">{manual.emoji}</div>
-            <h2 className={`text-xl font-bold ${manual.color}`}>
-              {manual.titulo}
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">{manual.descripcion}</p>
-            <p className="text-xs text-gray-400 mt-3">
-              {manual.pasos.length} pasos
-            </p>
-          </div>
+          {/* Tarjeta del Libro */}
+          <div className="bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden">
+            {/* Header del libro  */}
+            <div className={`${manual.colorBg} px-8 py-10 relative overflow-hidden`}>
+              <div
+                className={`absolute top-0 right-0 -mr-10 -mt-10 opacity-10 text-[10rem]`}
+              >
+                {manual.emoji}
+              </div>
+              <div className="relative z-10">
+                <div className="text-5xl mb-4 drop-shadow-sm">
+                  {manual.emoji}
+                </div>
+                <h2 className={`text-3xl font-black ${manual.color} mb-2 tracking-tight`}>
+                  {manual.titulo}
+                </h2>
+                <p className="text-base text-gray-700 font-medium max-w-lg">
+                  {manual.descripcion}
+                </p>
+              </div>
+            </div>
 
-          {/* Pasos */}
-          <div className="space-y-3">
-            {manual.pasos.map((paso, idx) => {
-              const estaActivo = pasoActivo === idx;
-              const estaCompletado = pasoActivo > idx;
+            {/* Lista continua de contenido */}
+            <div className="px-8 py-10 space-y-8 relative">
+              {/* Línea conectora visual */}
+              <div className="absolute left-[3.2rem] top-12 bottom-12 w-px bg-gray-100"></div>
 
-              return (
-                <button
-                  key={idx}
-                  onClick={() => setPasoActivo(idx)}
-                  className={`w-full text-left rounded-xl border-2 p-4 transition-all duration-200 ${
-                    estaActivo
-                      ? `${manual.colorBorde} ${manual.colorBg} shadow-sm`
-                      : estaCompletado
-                        ? "border-gray-100 bg-gray-50"
-                        : "border-gray-100 bg-white hover:border-gray-200"
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    {/* Número / check */}
+              {manual.pasos.map((paso, idx) => (
+                <div key={idx} className="relative z-10">
+                  <div className="flex flex-col sm:flex-row gap-5 items-start">
+                    {/* Número/Bullet flotante */}
                     <div
-                      className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold mt-0.5 ${
-                        estaCompletado
-                          ? "bg-gray-300 text-gray-500"
-                          : estaActivo
-                            ? `${manual.colorBg} ${manual.color} border-2 ${manual.colorBorde}`
-                            : "bg-gray-100 text-gray-400"
-                      }`}
+                      className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-sm border ${manual.colorBg} ${manual.colorBorde} ${manual.color} bg-white mt-1`}
                     >
-                      {estaCompletado ? "✓" : idx + 1}
+                      {idx + 1}
                     </div>
 
                     <div className="flex-1">
-                      <p
-                        className={`text-sm leading-relaxed ${estaActivo ? "font-medium text-gray-900" : "text-gray-600"}`}
-                      >
+                      {/* Texto de la regla */}
+                      <div className="text-gray-800 leading-relaxed font-medium">
                         {paso.texto}
-                      </p>
+                      </div>
 
-                      {/* Tip — solo visible cuando el paso está activo */}
-                      {estaActivo && paso.tip && (
-                        <div className="mt-2 flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                          <span className="text-amber-500 text-sm shrink-0">
-                            💡
-                          </span>
-                          <p className="text-xs text-amber-800 leading-relaxed">
-                            {paso.tip}
-                          </p>
+                      {/* Pro-Tip de la "Receta" */}
+                      {paso.tip && (
+                        <div className="mt-4 relative group">
+                          <div className="absolute inset-0 bg-yellow-400 rounded-xl blur-[2px] opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                          <div className="relative bg-gradient-to-r from-yellow-50 to-orange-50/30 border border-yellow-200/60 rounded-xl px-5 py-4">
+                            <div className="flex items-start gap-3">
+                              <div className="text-yellow-600 text-lg shrink-0 mt-0.5">
+                                💡
+                              </div>
+                              <div>
+                                <h4 className="text-xs font-bold text-yellow-800 uppercase tracking-widest mb-1 opacity-70">
+                                  PROTIP DE PACHAMAMA
+                                </h4>
+                                <p className="text-sm text-yellow-900/90 leading-relaxed font-medium">
+                                  {paso.tip}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
                   </div>
-                </button>
-              );
-            })}
-          </div>
+                </div>
+              ))}
+            </div>
 
-          {/* Navegación entre pasos */}
-          <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
-            <button
-              onClick={() => setPasoActivo((p) => Math.max(0, p - 1))}
-              disabled={pasoActivo === 0}
-              className="text-sm px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            >
-              ← Anterior
-            </button>
-
-            <span className="text-xs text-gray-400">
-              Paso {pasoActivo + 1} de {manual.pasos.length}
-            </span>
-
-            {pasoActivo < manual.pasos.length - 1 ? (
-              <button
-                onClick={() =>
-                  setPasoActivo((p) => Math.min(manual.pasos.length - 1, p + 1))
-                }
-                className={`text-sm px-4 py-2 rounded-lg text-white font-medium transition-colors ${manual.color.replace("text-", "bg-").replace("-700", "-600")} hover:opacity-90`}
-              >
-                Siguiente →
-              </button>
-            ) : (
+            {/* Footer de Finalización */}
+            <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-end">
               <button
                 onClick={cerrarManual}
-                className="text-sm px-4 py-2 rounded-lg bg-gray-800 text-white font-medium hover:bg-gray-900 transition-colors"
+                className="px-6 py-2.5 rounded-xl bg-gray-900 text-white font-bold hover:bg-black transition-all hover:scale-105 active:scale-95 shadow-md flex items-center gap-2"
               >
-                ✓ Finalizar
+                <span>¡Entendido!</span>
+                <span>✓</span>
               </button>
-            )}
+            </div>
           </div>
         </div>
       )}

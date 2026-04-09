@@ -19,6 +19,7 @@ export interface Producto {
   disponible: boolean;
   observaciones?: string;
   created_at: string;
+  stock: number;
 }
 
 export interface Cliente {
@@ -59,4 +60,27 @@ export interface Gasto {
   fecha: string;
   detalles?: string;
   created_at: string;
+}
+
+export interface StockMovimiento {
+  id: string;
+  producto_id: string;
+  tipo: "entrada" | "salida" | "devolucion" | "ajuste";
+  cantidad: number;
+  pedido_id?: string | null;
+  notas?: string;
+  created_at: string;
+  productos?: Producto; // join opcional
+}
+
+export interface Oferta {
+  id: string;
+  producto_id: string;
+  tipo_oferta: "exacta" | "minima";
+  cantidad_condicion: number;
+  precio_oferta: number; // si exacta: precio total | si minima: precio por unidad
+  activa: boolean;
+  descripcion?: string;
+  created_at: string;
+  productos?: Producto; // join opcional
 }
