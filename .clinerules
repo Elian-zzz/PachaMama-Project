@@ -20,6 +20,12 @@ Al añadir neuvas features, asegúrate de que estas estructuras permanezcan inta
 - El sistema cuenta (o debe contar) con un módulo para formatear pedidos/catálogos, permitiendo al usuario **Copiar y Pegar directo a WhatsApp**.
 - Al enviar/copiar este mensaje, debe guardarse la "memoria" o registro del mensaje generado en Supabase para tener historial con cada cliente. Esta feature no debe ser eliminada por limpiar o re-hacer módulos de pedido. Si ves que falta, debe reconstruirse sin romper la de Ofertas.
 
+### 3. Directiva de Seguridad Shift Left
+- El repositorio debe usar `pnpm` como gestor de paquetes preferido en WSL Ubuntu por seguridad de la cadena de suministro.
+- `pnpm-lock.yaml` es el archivo de bloqueo autorizado; no usar `package-lock.json` para instalaciones de dependencias en este proyecto.
+- Todo commit debe ser auditado con `pnpm audit` antes de permitirlo, usando un hook de Husky que ejecuta `pnpm audit --audit-level=moderate`.
+- La CI debe instalar dependencias con `pnpm install --frozen-lockfile` y mantener versiones auditadas actualizadas.
+
 ### 3. Persistencia Local y Autónoma
 - Pantallas orientadas al teclado/ratón optimizadas para "Kioscos" locales. Debe mantenerse la agilidad visual y de clics en todo momento.
 

@@ -227,7 +227,7 @@ export function GestorOfertasModal({ onClose }: Props) {
                   <input
                     type="number"
                     min="0"
-                    step="0.5"
+                    step="0.01"
                     value={form.cantidad_condicion}
                     onChange={(e) =>
                       setForm({ ...form, cantidad_condicion: e.target.value })

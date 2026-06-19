@@ -334,7 +334,7 @@ export function NuevoPedidoModal({ onClose, onPedidoCreado }) {
                       <input
                         type="number"
                         min="0"
-                        step="0.5"
+                        step="0.01"
                         value={cantidad}
                         onChange={(e) =>
                           handleCantidadChange(producto, e.target.value)

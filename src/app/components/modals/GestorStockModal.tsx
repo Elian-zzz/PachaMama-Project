@@ -164,7 +164,7 @@ export function GestorStockModal({
               <input
                 type="number"
                 min="0"
-                step="0.5"
+                step="0.01"
                 value={cantidad}
                 onChange={(e) => setCantidad(e.target.value)}
                 placeholder={`Ej: 10 ${producto.unidad}`}
@@ -188,7 +188,7 @@ export function GestorStockModal({
               </label>
               <input
                 type="number"
-                step="0.5"
+                step="0.01"
                 value={nuevoStock}
                 onChange={(e) => setNuevoStock(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent text-lg font-semibold"

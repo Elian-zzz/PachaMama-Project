@@ -85,7 +85,7 @@ A modern, fully-featured dashboard management system for vegetable delivery busi
 ## 🔧 System Requirements
 
 - **Node.js**: ≥ 18.0.0
-- **npm**: ≥ 9.0.0 (or yarn, pnpm)
+- **pnpm**: ≥ 8.0.0 (recommended for secure dependency management)
 - **Browser**: Chrome, Firefox, Safari, Edge (latest versions)
 - **Operating System**: Windows, macOS, or Linux
 
@@ -121,10 +121,10 @@ chmod +x install-dependencies.sh
 
 ```bash
 # Install main dependencies
-npm install recharts lucide-react sonner
+pnpm add recharts lucide-react sonner
 
 # Install Radix UI components
-npm install @radix-ui/react-accordion @radix-ui/react-alert-dialog \
+pnpm add @radix-ui/react-accordion @radix-ui/react-alert-dialog \
   @radix-ui/react-aspect-ratio @radix-ui/react-avatar \
   @radix-ui/react-checkbox @radix-ui/react-collapsible \
   @radix-ui/react-context-menu @radix-ui/react-dialog \
@@ -139,16 +139,16 @@ npm install @radix-ui/react-accordion @radix-ui/react-alert-dialog \
   @radix-ui/react-tooltip
 
 # Install utility libraries
-npm install class-variance-authority clsx tailwind-merge
+pnpm add class-variance-authority clsx tailwind-merge
 
 # Install development dependencies (Tailwind CSS v4)
-npm install -D @vitejs/plugin-react-swc tailwindcss@latest @tailwindcss/vite@latest
+pnpm add -D @vitejs/plugin-react-swc tailwindcss@latest @tailwindcss/vite@latest
 ```
 
 ### Step 3: Verify Installation
 
 ```bash
-npm list react vite tailwindcss
+pnpm list react vite tailwindcss
 ```
 
 ---
@@ -347,16 +347,16 @@ All UI components are located in `src/app/components/ui/` and can be customized 
 
 ```bash
 # Start development server with HMR
-npm run dev
+pnpm run dev
 
 # Build for production
-npm run build
+pnpm run build
 
 # Preview production build locally
-npm run preview
+pnpm run preview
 
 # Run ESLint to check code quality
-npm run lint
+pnpm run lint
 ```
 
 ---
@@ -392,7 +392,7 @@ resolve: {
 **Solution:** Specify a different port:
 
 ```bash
-npm run dev -- --port 3000
+pnpm run dev -- --port 3000
 ```
 
 ---

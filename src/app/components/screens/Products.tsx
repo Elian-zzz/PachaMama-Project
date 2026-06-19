@@ -224,9 +224,11 @@ export function Products() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     <option value="kg">kg</option>
+                    <option value="g">g</option>
                     <option value="unidad">unidad</option>
                     <option value="atado">atado</option>
                     <option value="litro">litro</option>
+                    <option value="ml">ml</option>
                     <option value="docena">docena</option>
                     <option value="bandeja">bandeja</option>
                   </select>
